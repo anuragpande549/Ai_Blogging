@@ -1,0 +1,168 @@
+import axios from "axios";
+import toast from "react-hot-toast";
+
+axios.defaults.baseURL = import.meta.env.VITE_BASE_URL;
+// axios.defaults.withCredentials = true
+
+
+
+
+const getData = async (url) => {
+  try {
+    const { data } = await axios.get(url);
+    if (data.success) {
+      return data.data; // Return the blogs and category
+    } else {
+      toast.error(data.message);
+    }
+  } catch (error) {
+    const message = error?.response?.data?.message || error.message || "Something went wrong";
+    toast.error(message);
+  }
+};
+
+
+const signUp = async (url, formData) => {
+  try {
+    const { data } = await axios.post(url, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    console.log(data);
+    if (data.success) {
+      toast.success(data.data);
+      return data;
+    } else {
+      toast.error(data.data);
+    }
+  } catch (error) {
+    const message = error?.response?.data?.data || error.message || "Something went wrong";
+    toast.error(message);
+    return false;
+  }
+};
+const logIn = async (url, formData) => {
+  try {
+    const { data } = await axios.post(url, formData,{
+      headers:{"Content-Type": "application/json"}
+    });
+
+    if (data.success) {
+      toast.success(data.message);
+      return data.data;
+    } else {
+      toast.error(data.message || "Request failed");
+      return false;
+    }
+  } catch (error) {
+    const message = error?.response?.data?.message || error.message || "Something went wrong";
+    toast.error(message);
+    return false;
+  }
+};
+
+const logOut = async (url, token) => {
+  try {
+    const { data } = await axios.post(
+      url,
+      {}, 
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        withCredentials: true
+      }
+    );
+
+    if (data.success) {
+      return data;
+    } else {
+      toast.error(data.message);
+    }
+  } catch (error) {
+    const message = error?.response?.data?.message || error.message || "Something went wrong";
+    toast.error(message);
+  }
+};
+
+
+
+const submitBlog = async (url, formData, token) => {
+  try {
+    const { data } = await axios.post(url, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    if (data.success) {
+      toast.success('Blog submitted successfully');
+      console.log('Blog Data:', data);
+      return data;
+    } else {
+      toast.error('Submission failed');
+      return false;
+    }
+  } catch (error) {
+    const message =
+      error?.response?.data?.message || error.message || 'Something went wrong';
+    toast.error(message);
+    console.error('Error submitting blog:', message);
+    return false;
+  }
+};
+const generateBlog = async (url, formData, token) => {
+  try {
+    const { data } = await axios.post(url, formData, {
+      headers: {
+        'Content-Type': "application/json",
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    if (data.success) {
+      toast.success('Blog submitted successfully');
+      console.log('Blog Data:', data);
+      return data;
+    } else {
+      toast.error('Submission failed');
+      return false;
+    }
+  } catch (error) {
+    const message = error?.response?.data?.message?.message || error.message || 'Something went wrong';
+    toast.error(message);
+    console.error('Error submitting blog:', message);
+    return false;
+  }
+};
+
+const getBlogData = async (url, _id) => {
+  console.log("fetch:", { url, _id });
+  try {
+    const response = await axios.get(`${url}/${_id}`, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    if (response.data.success) {
+      toast.success(response.data?.data?.blogDetails?.title || "success");
+    } else {
+      toast.error("Something went wrong");
+    }
+    console.log({ data: response.data });
+    return response.data;
+  } catch (error) {
+    const message = error?.response?.data?.message || error.message || "Something went wrong";
+    console.error("Error fetching blog data:", message);
+  }
+};
+
+
+
+
+
+
+
+
+
+export {getData, signUp,logIn, logOut, submitBlog, generateBlog, getBlogData};
