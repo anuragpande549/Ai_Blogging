@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { assets, dashboard_data } from "../../assets/assets";
 import BlogTableItems from "./BlogTableItems";
+import { getUserBlog } from "../../context/fetchData";
+import {useSelector} from "react-redux"
 
 function Dashboard() {
   const [dashboardData, setDashboardData] = useState({
@@ -9,14 +11,31 @@ function Dashboard() {
     drafts: 0,
     recentBlogs: []
   });
+  const [page, setPage] = useState({
+    page:1,
+    limit:10
+  }) 
+  const token = useSelector((state)=> state?.auth?.accessToken)
 
   useEffect(() => {
     fetchDashboard();
   }, []);
 
-  const fetchDashboard = async () => {
-    setDashboardData(dashboard_data);
-  };
+const fetchDashboard = async () => {
+  const data = await getUserBlog("/blogs/user-post", page, token);
+  console.log(data);
+
+  const publishedCount = data.filter((item) => item.isPublish === true).length;
+  const draftCount = data.filter((item) => item.isPublish === false).length;
+
+  setDashboardData({
+    blogs: data.length,
+    comments: 0,
+    drafts: draftCount,
+    recentBlogs: data
+  });
+};
+
 
   return (
     <div className="flex-1 w-full p-4 md:p-10 bg-blue-50/50">
@@ -53,11 +72,13 @@ function Dashboard() {
               <th className="px-2 py-4 max-sm:hidden">Date</th>
               <th className="px-2 py-4 max-sm:hidden">Status</th>
               <th className="px-2 py-4">Action</th>
+              <th className="px-2 py-4">Edit</th>
+              <th className="px-2 py-4">Delete</th>
             </tr>
           </thead>
           <tbody>
-            {dashboardData.recentBlogs.map((blog, index) => (
-              <BlogTableItems key={blog._id} blog={blog} fetchBlogs={fetchDashboard} index={index + 1} />
+            {dashboardData.recentBlogs.slice(0,5).map((blog, index) => (
+             <BlogTableItems key={blog._id} blog={blog} fetchBlog={fetchDashboard} index={index + 1} />
             ))}
           </tbody>
         </table>

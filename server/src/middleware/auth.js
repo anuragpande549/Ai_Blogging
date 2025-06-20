@@ -17,9 +17,9 @@ try {
         const user = await User.findById(decryptToken?._id).select("-password -refreshToken");
         if(!user) throw new ApiError(401, "Access token is invalid");
 
-        // append user in request
+
         req.user = user;
-        // next 
+
         next()
 } catch (error) {
     throw new ApiError(401, error?.message || "Invalid access token")

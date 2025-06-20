@@ -157,12 +157,93 @@ const getBlogData = async (url, _id) => {
   }
 };
 
+const getUserBlog = async (url, formData, token) => {
+  try {
+    const response = await axios.post(url, formData, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response.data?.success) {
+      toast.success(response.data.message);
+      return response.data.data;
+    } else {
+      toast.error("Something went wrong");
+    }
+  } catch (error) {
+    const message =
+      error?.response?.data?.message || error.message || "Something went wrong";
+    console.error(message);
+    toast.error(message);
+    return false;
+  }
+};
+
+
+
+
+const changePublish = async (url, formData,token) => {
+  try {
+    const response = await axios.put(url, formData, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response.data?.success) {
+      toast.success(response.data.message);
+      return response.data.data;
+    } else {
+      toast.error("Something went wrong");
+    }
+  } catch (error) {
+    const message =
+      error?.response?.data?.message || error.message || "Something went wrong";
+    console.error(message);
+    toast.error(message);
+    return false;
+  }
+};
+
+
+const postDelete = async (url, formData, token) => {
+  console.log({ 
+    url,
+    formData,
+    token
+  })
+   try {
+    const response = await axios.delete(url,  {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      data:formData
+    });
+
+    if (response.data?.success) {
+      toast.success(response.data.message);
+      return response.data.data;
+    } else {
+      toast.error("Something went wrong");
+    }
+  } catch (error) {
+    const message =
+      error?.response?.data?.message || error.message || "Something went wrong";
+    console.error(message);
+    toast.error(message);
+    return false;
+  }
+};
 
 
 
 
 
 
-
-
-export {getData, signUp,logIn, logOut, submitBlog, generateBlog, getBlogData};
+export {getData, signUp,logIn, logOut, submitBlog, generateBlog, getBlogData,
+  getUserBlog,changePublish,postDelete
+};

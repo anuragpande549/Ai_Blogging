@@ -10,7 +10,7 @@ import { deleteFile } from "../utils/cloudinary.js";
 import main from "../config/gemini.js";
 
 const allBlogData = asyncHandler(async (req, res) => {
-  const blogs = await Blog.find({}, "_id title subTitle category image")
+  const blogs = await Blog.find({isPublish : true}, "_id title subTitle category image")
     .populate("category", "name -_id")// Only fetch category name
     .lean(); // Optional: improves performance
   const category = await Category.find({},"name connectBlog").lean()
@@ -23,9 +23,27 @@ const allBlogData = asyncHandler(async (req, res) => {
   );
 });
 
-const getUserBlog = asyncHandler(async (req, res) =>{
+const getUserBlog = asyncHandler(async (req, res) => {
+  const userID = req?.user?._id;
+  if (!userID) throw new ApiError(401, "User details not found");
 
-})
+  const { page, limit } = req.body;
+  if (!page || !limit) throw new ApiError(400, "Page and limit are required");
+
+  const skip = (page - 1) * limit;
+
+  const blogsList = await Blog.find({ author: userID })
+    .populate("category", "name -_id")
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit);
+
+  if (!blogsList || blogsList.length === 0)
+    throw new ApiError(404, "No blogs found");
+
+  res.status(200).json(new ApiResponse(200, blogsList, true));
+});
+
 
 const createBlog = asyncHandler(async (req, res)=>{
     const user = req?.user
@@ -126,29 +144,43 @@ const extractPublicId = (url) => {
 };
 
 const deleteBlog = asyncHandler(async (req, res) => {
-  const { blogId } = req.body;
-  if (!blogId) throw new ApiError(401, "Blog id is required");
+
+  console.log({"hsfcsaufhdsljdfvkldjvn":req.body})
+  const { blogId } = req.body
+
+
+  // Validate blog ID
+  if (!blogId) throw new ApiError(400, "Blog ID is required");
 
   const blog = await Blog.findById(blogId);
-  if (!blog) throw new ApiError(401, "Blog not found");
+  if (!blog) throw new ApiError(404, "Blog not found");
 
+  // Extract publicId from blog image
   const publicId = extractPublicId(blog.image);
-  if (!publicId) throw new ApiError(401, "Public ID is required");
+  if (!publicId) throw new ApiError(422, "Invalid public ID from image URL");
 
-  const deleteImageCloud = await deleteFile(publicId); // Assuming your Cloudinary util
-  if (!deleteImageCloud) throw new ApiError(401, "Failed to delete image from Cloudinary");
+  // Attempt to delete image from Cloudinary
+  const imageDeleted = await deleteFile(publicId);
+  if (!imageDeleted) throw new ApiError(500, "Failed to delete image from Cloudinary");
 
-  const result = await Promise.all([
-    User.updateOne({ _id: blog.author }, { $pull: { blogs: blog._id } }),
-    Category.updateMany({ _id: { $in: blog.category } }, { $pull: { connectBlog: blog._id } }),
+  // Clean up references in related collections
+  await Promise.all([
+    User.updateOne(
+      { _id: blog.author },
+      { $pull: { blogs: blog._id } }
+    ),
+    Category.updateMany(
+      { _id: { $in: blog.category } },
+      { $pull: { connectBlog: blog._id } }
+    ),
     Blog.deleteOne({ _id: blog._id })
   ]);
 
-  res.status(200).json(new ApiResponse(200, {
-    success: true,
-    messageDeletion: true
-  }));
+  res.status(200).json(
+    new ApiResponse(200, { message: "Blog deleted successfully" }, true)
+  );
 });
+
 
 const getBlog = asyncHandler(async (req, res) => {
   const  blogId  = req.params.blogId; // ⬅️ changed from body to params
@@ -176,14 +208,14 @@ const getBlog = asyncHandler(async (req, res) => {
 });
 
 const publishUpdate = asyncHandler(async (req, res) => {
-  const { status, blogId } = req.body;
+  const { isPublish, blogId } = req.body;
 
   if (!blogId) throw new ApiError(401, "blogId is required");
-  if (typeof status !== "boolean") throw new ApiError(401, "Status must be a boolean");
+  if (typeof isPublish !== "boolean") throw new ApiError(401, "Status must be a boolean");
 
   const updateBlog = await Blog.findByIdAndUpdate(
     blogId,
-    { $set: { isPublish: status } },
+    { $set: { isPublish: isPublish } },
     { new: true }
   );
 
@@ -215,5 +247,7 @@ and incorporate this description context: ${description}`
 
 
 
-export {createBlog,updateBlog,deleteBlog,getBlog,publishUpdate,allBlogData,generateContent}
+export {createBlog,updateBlog,deleteBlog,getBlog,publishUpdate,allBlogData,generateContent,
+  getUserBlog
+}
 

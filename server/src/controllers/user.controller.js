@@ -86,8 +86,14 @@ const userLogIn = asyncHandler(async(req,res)=>{
         sameSite: "Strict",
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     };
+    const options2 = {
+        // httpOnly: true,
+        // secure: true,
+        // sameSite: "Strict",
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    };
 
-    return res.cookie("accessToken",accessToken, options)
+    return res.cookie("accessToken",options2)
     .cookie("refreshToken", refreshToken, options)
     .json(
         new ApiResponse(
