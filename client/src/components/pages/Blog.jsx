@@ -35,7 +35,7 @@ const Blog = () => {
     if (result) {
       toast.success('Comment added! wait for approver by post owner');
       setContent('');
-      fetchCommentData(); // Uncomment if using real comment fetching
+      // fetchBlogData(); // Uncomment if using real comment fetching
     } else {
       toast.error('Failed to add comment');
     }

@@ -1,16 +1,15 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { assets, blogCategories } from '../assets/assets';
 import Quill from 'quill';
-import { generateBlog, submitBlog } from '../context/fetchData';
+import { generateBlog, submitBlog, updateBlog } from '../context/fetchData';
 import { useSelector } from 'react-redux';
-import  { parse } from "marked"
+import { parse } from 'marked';
 import AIGeneratingOverlay from './admin/AIGeneratingOverlay';
 import { useLocation } from 'react-router-dom';
 
-function AddBlog({}) {
-  const location = useLocation()
+function AddBlog() {
+  const location = useLocation();
   const blog = location?.state;
-  console.log(blog);
 
   const editorRef = useRef(null);
   const quillRef = useRef(null);
@@ -20,68 +19,10 @@ function AddBlog({}) {
   const [subTitle, setSubTitle] = useState('');
   const [category, setCategory] = useState('');
   const [isPublished, setIsPublished] = useState(false);
-
   const [isAdding, setIsAdding] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  const token = useSelector((state)=>state.auth.accessToken);
-
-  const setLocalData = () =>{
-    setTitle(blog?.title)
-    setSubTitle(blog?.subTitle)
-    setCategory(blog?.category[0]?.name)
-    setIsPublished(blog?.isPublish)
-    quillRef.current.root.innerHTML = parse(blog?.description)
-  }
-
-  const clearBlog = ()=>{
-    setImage(null)
-    setTitle(""),
-    setSubTitle(""),
-    setCategory(""),
-    setIsPublished(false),
-    quillRef.current.setContents("")
-  }
-
-  const generateContent = async () => {
-    setIsGenerating(true);
-    const description = JSON.stringify(quillRef.current.getContents());
-    const formData = new FormData();
-    formData.append('title', title);
-    formData.append('subTitle', subTitle);
-    formData.append('description', description);
-
-    const data = await generateBlog('/blogs/generate', formData, token);
-    if(data){
-
-      console.log("data :", data)
-      console.log("my data :",data.message.data)
-      quillRef.current.root.innerHTML =  parse(data.message.data)
-    }
-    setIsGenerating(false);
-   };
-
-  const submitForm = async () => {
-    const description = quillRef.current.root.innerHTML;
-
-    const formData = new FormData();
-    formData.append('title', title);
-    formData.append('subTitle', subTitle);
-    formData.append('description', description);
-    formData.append('category', category);
-    formData.append('isPublish', isPublished);
-    formData.append('image', image);
-
-    await submitBlog('/blogs/create-blog', formData, token);
-  };
-
-  const onSubmitHandler = async (e) => {
-    e.preventDefault();
-    setIsAdding(true);
-    await submitForm();
-    setIsAdding(false);
-    clearBlog()
-  };
+  const token = useSelector((state) => state.auth.accessToken);
 
   useEffect(() => {
     if (!quillRef.current && editorRef.current) {
@@ -98,11 +39,83 @@ function AddBlog({}) {
         },
         placeholder: 'Write your blog content here...',
       });
-       if (quillRef.current && blog) {
-        setLocalData()
-      };
+
+      // Load blog data after Quill initialized
+      if (blog) {
+        setTimeout(() => {
+          setTitle(blog?.title || '');
+          setSubTitle(blog?.subTitle || '');
+          setCategory(blog?.category[0]?.name || '');
+          setIsPublished(blog?.isPublish || false);
+          if (blog?.description) {
+            quillRef.current.root.innerHTML = parse(blog.description);
+          }
+        }, 0);
+      }
     }
   }, [blog]);
+
+  const clearBlog = () => {
+    setImage(null);
+    setTitle('');
+    setSubTitle('');
+    setCategory('');
+    setIsPublished(false);
+    if (quillRef.current) quillRef.current.setText('');
+  };
+
+  const generateContent = async () => {
+    setIsGenerating(true);
+    const description = JSON.stringify(quillRef.current.getContents());
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('subTitle', subTitle);
+    formData.append('description', description);
+
+    const data = await generateBlog('/blogs/generate', formData, token);
+    if (data?.message?.data) {
+      quillRef.current.root.innerHTML = parse(data.message.data);
+    }
+    setIsGenerating(false);
+  };
+
+  const formDataGen = () => {
+    const description = quillRef.current.root.innerHTML;
+    const formData = new FormData();
+
+    formData.append('title', title);
+    formData.append('subTitle', subTitle);
+    formData.append('description', description);
+    formData.append('category', category);
+    formData.append('isPublish', isPublished);
+    formData.append('blogId', blog?._id);
+
+    // If new image selected, append it
+    if (image && typeof image !== 'string') {
+      formData.append('image',image);
+    }
+
+    return formData;
+  };
+
+  const submitForm = async () => {
+    const formData = formDataGen();
+
+    await submitBlog('/blogs/create-blog', formData, token);
+  };
+
+  const updateData = async () => {
+    const formData = formDataGen();
+    await updateBlog(`/blogs/update-blog`, formData, token); // assuming PUT method for update
+  };
+
+  const onSubmitHandler = async (e) => {
+    e.preventDefault();
+    setIsAdding(true);
+    blog ? await updateData() : await submitForm();
+    setIsAdding(false);
+    clearBlog();
+  };
 
   return (
     <form
@@ -113,16 +126,24 @@ function AddBlog({}) {
         <p>Upload Thumbnail</p>
         <label htmlFor="image">
           <img
-            src={image ? URL.createObjectURL(image) : blog?.image? blog.image :assets.upload_area}
+            src={
+              image
+                ? typeof image === 'string'
+                  ? image
+                  : URL.createObjectURL(image)
+                : blog?.image || assets.upload_area
+            }
             alt="thumbnail"
             className="mt-2 h-16 rounded cursor-pointer"
           />
           <input
-            onChange={(e) => setImage(e.target.files[0])}
+            onChange={(e) => {
+              const file = e.target.files[0];
+              if (file) setImage(file);
+            }}
             type="file"
             id="image"
             hidden
-            required
           />
         </label>
 
@@ -149,16 +170,15 @@ function AddBlog({}) {
         <p className="mt-4">Blog Description</p>
         <div className="max-w-lg h-72 pb-16 sm:pb-10 pt-2 relative">
           <div ref={editorRef} className="h-full" />
-          {isGenerating && <AIGeneratingOverlay />} {/* 👈 Add this overlay here */}
+          {isGenerating && <AIGeneratingOverlay />}
           <button
             type="button"
             onClick={generateContent}
             className="absolute bottom-1 right-2 ml-2 text-white bg-black/70 px-4 py-1.5 rounded hover:underline cursor-pointer"
           >
-            {isGenerating ? "Generating ..." : "Generate With AI"}
+            {isGenerating ? 'Generating ...' : 'Generate With AI'}
           </button>
         </div>
-
 
         <p className="mt-4">Blog Category</p>
         <select
@@ -190,7 +210,13 @@ function AddBlog({}) {
           type="submit"
           className="mt-8 w-32 sm:w-40 h-10 bg-primary text-white rounded cursor-pointer text-sm"
         >
-          {isAdding ? 'Adding Blog...' : 'Add Blog'}
+          {blog
+            ? isAdding
+              ? 'Updating Blog...'
+              : 'Update Blog'
+            : isAdding
+            ? 'Adding Blog...'
+            : 'Add Blog'}
         </button>
       </div>
     </form>

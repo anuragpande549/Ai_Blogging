@@ -93,29 +93,26 @@ const createBlog = asyncHandler(async (req, res)=>{
     )
 
 })
+
 const updateBlog = asyncHandler(async (req, res) => {
   const user = req?.user;
   const {blogId} = req.body;
 
   const { title, subTitle, description, category, isPublish } = req.body;
-  const image =  req.body || req?.files?.image?.[0]?.path;
-
-  console.log({image});
-
+  
   if (!blogId) throw new ApiError(400, "Blog ID is required for update");
-
+  
   const blog = await Blog.findById(blogId);
   if (!blog) throw new ApiError(404, "Blog not found");
   if (!blog.author.equals(user._id)) throw new ApiError(403, "Unauthorized to update this blog");
-
+  
   let updatedFields = {
     title,
     subTitle,
     description,
     isPublish,
-   
   };
-
+  
   if (category) {
     const updatedCategory = await Category.findOneAndUpdate(
       { name: category },
@@ -126,11 +123,14 @@ const updateBlog = asyncHandler(async (req, res) => {
     updatedFields.category = updatedCategory._id;
   }
 
-  // if (image) {
-  //   const uploadedImage = await cloudinaryUpload(image);
-  //   if (!uploadedImage) throw new ApiError(400, "Failed to upload image");
-  //   updatedFields.image = uploadedImage.secure_url;
-  // }
+  const image =   req?.files?.image?.[0]?.path;
+  console.log({image});
+
+  if (image) {
+    const uploadedImage = await cloudinaryUpload(image);
+    if (!uploadedImage) throw new ApiError(400, "Failed to upload image");
+    updatedFields.image = uploadedImage.secure_url;
+  }
 
   const updatedBlog = await Blog.findByIdAndUpdate(blogId, updatedFields, { new: true });
   if (!updatedBlog) throw new ApiError(400, "Blog update failed");
@@ -190,7 +190,8 @@ const getBlog = asyncHandler(async (req, res) => {
   if (!blogId) throw new ApiError(400, "Blog ID is required");
 
   const blogDetails = await Blog.findById(blogId).populate({
-    path:"comments"
+    path:"comments",
+    match:{"isApproved":true}
   });
   if (!blogDetails) throw new ApiError(404, "Blog not found");
 

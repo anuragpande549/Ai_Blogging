@@ -5,7 +5,7 @@ import { putStatus, deleteComment as removeComment } from '../../../context/fetc
 import toast from 'react-hot-toast';
 
 function CommentTableItems({ comment, index, fetchComments }) {
-  const { blog, isApproved, createdAt, _id, name, content } = comment;
+  const { blog, isApproved, createdAt, _id, name, user, content } = comment;
   const BlogDate = new Date(createdAt);
   const token = useSelector((state) => state?.auth?.accessToken);
 
@@ -40,7 +40,7 @@ function CommentTableItems({ comment, index, fetchComments }) {
 
       <td className='px-6 py-4'>
         <p><b className='font-medium text-gray-600'>Blog</b>: {blog.title}</p>
-        <p><b className='font-medium text-gray-600'>Name</b>: {name}</p>
+        <p><b className='font-medium text-gray-600'>Name</b>: {user}</p>
         <p><b className='font-medium text-gray-600'>Comment</b>: {content}</p>
       </td>
 

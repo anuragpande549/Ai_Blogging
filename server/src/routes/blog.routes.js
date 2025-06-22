@@ -14,7 +14,7 @@ blogRoutes.route("/create-blog").post( authUser, upload.fields([
     }
 ]), createBlog );
 
-blogRoutes.route("/update-blog").patch(authUser, upload.fields([
+blogRoutes.route("/update-blog").put(authUser, upload.fields([
     {
         name:"image",
         maxCount:1

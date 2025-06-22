@@ -342,11 +342,34 @@ const addComment = async (url, formData, token) => {
 };
 
 
+const updateBlog = async (url, formData, token) => {
+  try {
+    const { data } = await axios.put(url, formData, {
+      headers: {
+        'Content-Type': "application/json",
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    if (data.success) {
+      toast.success('Blog submitted successfully');
+      console.log('Blog Data:', data);
+      return data;
+    } else {
+      toast.error('Submission failed');
+      return false;
+    }
+  } catch (error) {
+    const message = error?.response?.data?.message?.message || error.message || 'Something went wrong';
+    toast.error(message);
+    console.error('Error submitting blog:', message);
+    return false;
+  }
+};
 
 
 
 
-
-export {getData, signUp,logIn, logOut, submitBlog, generateBlog, getBlogData,
+export {getData, signUp,logIn, logOut, submitBlog, generateBlog, getBlogData,updateBlog,
   getUserBlog,changePublish,postDelete,getComment,putStatus,deleteComment,addComment
 };
