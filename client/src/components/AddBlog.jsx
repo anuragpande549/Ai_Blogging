@@ -5,8 +5,13 @@ import { generateBlog, submitBlog } from '../context/fetchData';
 import { useSelector } from 'react-redux';
 import  { parse } from "marked"
 import AIGeneratingOverlay from './admin/AIGeneratingOverlay';
+import { useLocation } from 'react-router-dom';
 
-function AddBlog() {
+function AddBlog({}) {
+  const location = useLocation()
+  const blog = location?.state;
+  console.log(blog);
+
   const editorRef = useRef(null);
   const quillRef = useRef(null);
 
@@ -20,6 +25,14 @@ function AddBlog() {
   const [isGenerating, setIsGenerating] = useState(false);
 
   const token = useSelector((state)=>state.auth.accessToken);
+
+  const setLocalData = () =>{
+    setTitle(blog?.title)
+    setSubTitle(blog?.subTitle)
+    setCategory(blog?.category[0]?.name)
+    setIsPublished(blog?.isPublish)
+    quillRef.current.root.innerHTML = parse(blog?.description)
+  }
 
   const clearBlog = ()=>{
     setImage(null)
@@ -85,8 +98,11 @@ function AddBlog() {
         },
         placeholder: 'Write your blog content here...',
       });
+       if (quillRef.current && blog) {
+        setLocalData()
+      };
     }
-  }, []);
+  }, [blog]);
 
   return (
     <form
@@ -97,7 +113,7 @@ function AddBlog() {
         <p>Upload Thumbnail</p>
         <label htmlFor="image">
           <img
-            src={image ? URL.createObjectURL(image) : assets.upload_area}
+            src={image ? URL.createObjectURL(image) : blog?.image? blog.image :assets.upload_area}
             alt="thumbnail"
             className="mt-2 h-16 rounded cursor-pointer"
           />

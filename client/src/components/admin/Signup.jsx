@@ -90,7 +90,7 @@ function Signup() {
           </div>
           <p className="font-light mb-5">
             Already have an account?{' '}
-            <Link to="/admin">
+            <Link to="/login">
               <span className="text-xl font-bold text-primary cursor-pointer">Login</span>
             </Link>
           </p>

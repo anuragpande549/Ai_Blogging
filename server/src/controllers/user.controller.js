@@ -93,7 +93,7 @@ const userLogIn = asyncHandler(async(req,res)=>{
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     };
 
-    return res.cookie("accessToken",options2)
+    return res.cookie("accessToken",accessToken,options2).cookie("login","true")
     .cookie("refreshToken", refreshToken, options)
     .json(
         new ApiResponse(

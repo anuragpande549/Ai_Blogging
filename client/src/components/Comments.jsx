@@ -1,18 +1,30 @@
 import React, { useEffect, useState } from 'react'
 import CommentTableItems from './pages/admin/CommentTableItems'
 import { comments_data } from '../assets/assets'
+import { useSelector } from 'react-redux'
+import {getComment} from "../context/fetchData.js"
+import toast from 'react-hot-toast'
+import SkeletonRow from './admin/SkeletonRow.jsx'
 
 function Comments() {
-  const [comments, setComments] = useState([])
+  const [comments, setComments] = useState()
   const [filter, setFilter] = useState("Not Approved")
 
+  const token = useSelector((state)=>state?.auth?.accessToken)
+  
+  console.log(comments)
+  
   const fetchComments = async () => {
-    setComments(comments_data)
+    const commentData = await getComment("/comment",token)
+
+    if(commentData && Array.isArray(commentData)) setComments(commentData);
+    
   }
 
   useEffect(() => {
     fetchComments()
   }, [])
+  // return(<></>)
 
   return (
     <div className='flex-1 pt-5 px-5 sm:pt-12 sm:pl-16 bg-blue-50/50'>
@@ -35,21 +47,34 @@ function Comments() {
         <table className='w-full text-sm text-gray-500'>
           <thead>
             <tr>
+              <th scope='col' className='px-6 py-3'>index</th>
               <th scope='col' className='px-6 py-3'>Blog Title & Comments</th>
               <th scope='col' className='px-6 py-3 max-s:hidden'>Date</th>
               <th scope='col' className='px-6 py-3'>Action</th>
             </tr>
           </thead>
           <tbody>
-            {comments.filter((comment) => filter === "Approved" ? comment.isApproved : !comment.isApproved)
-              .map((comment, index) => (
-                <CommentTableItems 
-                  key={comment._id} 
-                  comment={comment} 
-                  index={index + 1} 
-                  fetchComments={fetchComments} 
-                />
-            ))}
+          {comments ? comments.map((list)=>(
+          
+           list.comments.filter((listItems) => filter === "Approved" ? listItems.isApproved === true : listItems.isApproved === false)
+           .map((comments,index)=>(
+   
+
+              <CommentTableItems 
+              key={comments._id} 
+              comment={comments} 
+              index={index + 1} 
+              fetchComments={fetchComments} 
+              />
+            
+           ))
+          )) : <SkeletonRow />}
+
+            {/* {comments.filter((comment) => filter === "Approved" ? comment.isApproved === true : comment.isApproved === false)
+            
+            //   .map((comment, index) => (
+            // ))
+            } */}
           </tbody>
         </table>
       </div>

@@ -8,7 +8,7 @@ function BlogCard({blog}) {
   })
   const navigate = useNavigate()
 
-  return (
+  return ( 
 
     <div onClick={()=>navigate(`/blog/${_id}`)}>
       <img src={image} alt="" className='aspect-video'/>

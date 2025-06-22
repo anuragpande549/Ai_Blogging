@@ -3,12 +3,14 @@ import toast from 'react-hot-toast';
 import { logIn } from '../../context/fetchData';
 import { addToken } from '../redux/appSlice';
 import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLogin, setIsLogin] = useState(false);
   const dispatch = useDispatch()
+  const navigator = useNavigate()
 
   const clearFormData = () => {
     setEmail('');
@@ -34,6 +36,7 @@ function Login() {
     //  setToken(data.accessToken)
      localStorage.setItem("accessToken", data.accessToken);
       clearFormData();
+      navigator("/admin")
     } catch (error) {
       const message = error?.response?.data?.message || error.message || 'Something went wrong';
       toast.error(message);

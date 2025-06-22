@@ -11,18 +11,17 @@ app.use(cors({
 }))
 
 app.use(express.json())
-app.use(urlencoded({extended:true, limit:"16kb"}))
+app.use(urlencoded({extended:true, limit:"106kb"}))
 app.use(cookieParser());
 app.use(express.static("public"))
 
 import userRoutes from "./routes/user.routes.js";
 import blogRoutes from "./routes/blog.routes.js";
+import comment from "./routes/comment.routes.js";
 
 app.use("/user",userRoutes)
 app.use("/blogs",blogRoutes)
-
-
-
+app.use("/comment",comment)
 
 app.use((err, req, res, next) => {
 
@@ -53,9 +52,7 @@ app.use((err, req, res, next) => {
         errors: err.errors || [],
         suggestedFix: err.suggestedFix || "Try again later.",
     });
-});
-
-
+})
 
 
 export {app}

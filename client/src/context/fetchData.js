@@ -111,6 +111,7 @@ const submitBlog = async (url, formData, token) => {
     return false;
   }
 };
+
 const generateBlog = async (url, formData, token) => {
   try {
     const { data } = await axios.post(url, formData, {
@@ -239,11 +240,113 @@ const postDelete = async (url, formData, token) => {
   }
 };
 
+const getComment = async (url, token) => {
+  try {
+    const { data } = await axios.get(url, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    if (data) {
+
+      console.log("Message:", data.message);
+
+      return data?.message; // assuming data contains a `data` field with the actual comment list
+    } else {
+      toast.error("Something went wrong");
+      return false;
+    }
+
+  } catch (error) {
+    const message = error?.response?.data?.message || error.message || "Something went wrong";
+
+    console.error("Error fetching comments:", message);
+    return false;
+  }
+};
+
+const putStatus = async (url,status, token) => {
+  try {
+    const { data } = await axios.put(url, status, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    if (data) {
+
+      console.log("Message:", data);
+
+      return data?.message; // assuming data contains a `data` field with the actual comment list
+    } else {
+      toast.error("Something went wrong");
+      return false;
+    }
+
+  } catch (error) {
+    const message = error?.response?.data?.message || error.message || "Something went wrong";
+
+    console.error("Error fetching comments:", message);
+    return false;
+  }
+};
+
+const deleteComment = async (url, commentID, token) => {
+  try {
+    const { data } = await axios.delete(url, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      data: { commentID } // Make sure it's an object if your backend expects it this way
+    });
+
+    if (data) {
+      console.log("Message:", data.message); // Log just the message, cleaner
+      return data.message;
+    } else {
+      toast.error("Something went wrong");
+      return false;
+    }
+  } catch (error) {
+    const message = error?.response?.data?.message || error.message || "Something went wrong";
+    console.error("Delete error:", message);
+    toast.error(message);
+    return false;
+  }
+};
+
+
+const addComment = async (url, formData, token) => {
+
+  try {
+    const { data } = await axios.post(url, formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (data?.message) {
+      console.log("Message:", data.message);
+      return data.message;
+    } else {
+
+      return false;
+    }
+  } catch (error) {
+    const message = error?.response?.data?.message || error.message || "Something went wrong";
+    console.error("Add comment error:", message);
+
+    return false;
+  }
+};
+
+
 
 
 
 
 
 export {getData, signUp,logIn, logOut, submitBlog, generateBlog, getBlogData,
-  getUserBlog,changePublish,postDelete
+  getUserBlog,changePublish,postDelete,getComment,putStatus,deleteComment,addComment
 };

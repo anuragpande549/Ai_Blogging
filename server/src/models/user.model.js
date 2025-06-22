@@ -32,12 +32,6 @@ const userSchema = new mongoose.Schema({
             ref: "blog"
         }
     ],
-    comments: [
-        {
-            type: mongoose.Schema.ObjectId,
-            ref: "comment" //model name
-        }
-    ],
     refreshToken: {
         type: String,
     },

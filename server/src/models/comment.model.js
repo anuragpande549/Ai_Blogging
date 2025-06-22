@@ -2,9 +2,9 @@ import mongoose from "mongoose";
 
 const commentSchema = new mongoose.Schema({
     user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "user", 
-        required: true
+        type: String,
+        required: true,
+        trim: true
     },
     blog: {
         type: mongoose.Schema.Types.ObjectId,
@@ -15,6 +15,10 @@ const commentSchema = new mongoose.Schema({
         type: String,
         required: true,
         trim: true
+    },
+    isApproved:{
+        type:Boolean,
+        default:false
     },
     parentComment: { // Optional field for replies
         type: mongoose.Schema.Types.ObjectId,

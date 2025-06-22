@@ -3,9 +3,11 @@ import cross_icon from "../../assets/cross_icon.svg";
 import { changePublish,postDelete } from "../../context/fetchData";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
+import {Link} from "react-router-dom";
+import SkeletonRow from "./SkeletonRow";
 
 function BlogTableItems({ blog, index, fetchBlog }) {
-  const { title, createdAt, _id, isPublish } = blog;
+  const { title, createdAt, _id, description, isPublish ,subTitle} = blog;
   const BlogDate = new Date(createdAt);
 
 const [actionLoading, setActionLoading] = useState(false);
@@ -38,7 +40,7 @@ const ToggleDelete = async () => {
   };
 
 
-  return (
+  return ( 
     <tr className="border-y border-gray-300">
       <th className="px-2 py-4">{index}</th>
       <td className="px-2 py-4">{title}</td>
@@ -64,7 +66,11 @@ const ToggleDelete = async () => {
         </button>
       </td>
       <td className="w-8 hover:scale-110 transition-all cursor-pointer text-center">
+      <Link to="/admin/addBlog"
+      state={blog}
+      >
         ✒️
+      </Link>
       </td>
       <td className="px-2 py-4 text-center">
         <img onClick={ToggleDelete}

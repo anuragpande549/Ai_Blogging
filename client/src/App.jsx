@@ -30,15 +30,16 @@ const App = () => {
         <Route path="/blog/:id" element={<Blog />} />
 
         {/* Admin Route with Authentication Check */}
-        <Route path="admin" element={token ? <Layout /> : <Login />}>
+        <Route path="admin" element={token ? <Layout /> : <Signup />}>
           <Route index element={<Dashboard />} />
-          <Route path="addBlog" element={<AddBlog />} />
+          <Route path="addBlog/:id?" element={<AddBlog />} />
           <Route path="listBlog" element={<ListBlog />} />
           <Route path="comments" element={<Comments />} />
         </Route>
 
         {/* Signup Route */}
-        <Route path="/signup" element={<Signup />} />
+        <Route path="/login" element={token ? <Layout /> : <Login />} />
+        
       </Routes>
     </div>
   );
