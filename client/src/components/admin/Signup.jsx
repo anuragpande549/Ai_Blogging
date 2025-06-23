@@ -39,10 +39,13 @@ function Signup() {
     formData.append('avatar', profileImage); // Ensure backend expects 'avatar'
 
     const data = await signUp("/user/register", formData);
+    if(data){
 
-    setIsSubmitting(false);
-    resetForm()
-    navigate("/login")
+      setIsSubmitting(false);
+      resetForm()
+      navigate("/login")
+    }
+  
 
   };
 
