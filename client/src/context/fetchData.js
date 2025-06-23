@@ -37,6 +37,7 @@ const signUp = async (url, formData) => {
   } catch (error) {
     const message = error?.response?.data?.data || error.message || "Something went wrong";
     toast.error(message);
+    console.log(error);
     return false;
   }
 };

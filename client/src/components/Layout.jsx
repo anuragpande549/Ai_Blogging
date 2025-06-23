@@ -22,7 +22,7 @@ const token = useSelector((state) => state?.auth?.accessToken);
       if(data){
 
         dispatch(addToken(false));
-        localStorage.removeItem("accessToken")
+        document.cookie = "accessToken=; max-age=0; path=/; secure; SameSite=Strict";
         navigator('/')
         toast.success("LogOut Success")
       }
