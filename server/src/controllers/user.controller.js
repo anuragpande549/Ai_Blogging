@@ -111,7 +111,7 @@ const userLogIn = asyncHandler(async(req,res)=>{
 
 
 const userLogOut = asyncHandler(async (req, res) => {
-    console.log("user ")
+    console.log("user :", req)
     const userId = req?.user?._id;
     if (!userId) throw new ApiError(400, "user is is not receive");
 

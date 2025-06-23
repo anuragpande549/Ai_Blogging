@@ -61,6 +61,7 @@ const logIn = async (url, formData) => {
 };
 
 const logOut = async (url, token) => {
+  console.log({url, token})
   try {
     const { data } = await axios.post(
       url,
