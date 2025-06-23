@@ -42,7 +42,7 @@ function Signup() {
 
     setIsSubmitting(false);
     resetForm()
-    navigate("/admin")
+    navigate("/login")
 
   };
 

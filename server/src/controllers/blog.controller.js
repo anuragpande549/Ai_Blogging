@@ -10,7 +10,7 @@ import { deleteFile } from "../utils/cloudinary.js";
 import main from "../config/gemini.js";
 
 const allBlogData = asyncHandler(async (req, res) => {
-  const blogs = await Blog.find({isPublish : true}, "_id title subTitle category image")
+  const blogs = await Blog.find({isPublish : true}, "_id title subTitle category image").sort({ createdAt: -1 })
     .populate("category", "name -_id")// Only fetch category name
     .lean(); // Optional: improves performance
   const category = await Category.find({},"name connectBlog").lean()
@@ -34,6 +34,7 @@ const getUserBlog = asyncHandler(async (req, res) => {
 
   const blogsList = await Blog.find({ author: userID })
     .populate("category", "name -_id")
+    
     .sort({ createdAt: -1 })
     .skip(skip)
     .limit(limit);

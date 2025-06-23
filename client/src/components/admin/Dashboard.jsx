@@ -3,13 +3,14 @@ import { assets, dashboard_data } from "../../assets/assets";
 import BlogTableItems from "./BlogTableItems";
 import { getUserBlog } from "../../context/fetchData";
 import {useSelector} from "react-redux"
+import SkeletonRow from "./SkeletonRow";
 
 function Dashboard() {
   const [dashboardData, setDashboardData] = useState({
     blogs: 0,
     comments: 0,
     drafts: 0,
-    recentBlogs: []
+    recentBlogs: false
   });
   const [page, setPage] = useState({
     page:1,
@@ -27,10 +28,17 @@ const fetchDashboard = async () => {
 
   const publishedCount = data.filter((item) => item.isPublish === true).length;
   const draftCount = data.filter((item) => item.isPublish === false).length;
+  let commentCount = 0;
+
+  data.forEach((item) => {
+    commentCount += item.comments.length;
+  });
+
+
 
   setDashboardData({
     blogs: data.length,
-    comments: 0,
+    comments: commentCount,
     drafts: draftCount,
     recentBlogs: data
   });
@@ -77,9 +85,10 @@ const fetchDashboard = async () => {
             </tr>
           </thead>
           <tbody>
-            {dashboardData.recentBlogs.slice(0,5).map((blog, index) => (
+            {console.log(dashboardData.recentBlogs)}
+            {dashboardData.recentBlogs  ? dashboardData.recentBlogs.slice(0,5).map((blog, index) => (
              <BlogTableItems key={blog._id} blog={blog} fetchBlog={fetchDashboard} index={index + 1} />
-            ))}
+            )):<SkeletonRow/>}
           </tbody>
         </table>
       </div>

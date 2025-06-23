@@ -1,13 +1,21 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(';').shift();
+}
+
+
 const initialState = {
     auth :{
-        accessToken: localStorage.getItem("accessToken") || false
+        accessToken: getCookie('accessToken')|| false
     },
     homePage :{
         category:[],
         blogs: [],
-    }
+    },
+    search : "",
 }
 
 const appSlice = createSlice({
@@ -22,9 +30,12 @@ const appSlice = createSlice({
         },
         addToken:(state, action)=>{
             state.auth.accessToken = action.payload
+        },
+        searchAdd:(state, action)=>{
+            state.search  = action.payload
         }
     }
 })
 
-export const {addCategory, addBlogs, addToken} = appSlice.actions
+export const {addCategory, addBlogs, searchAdd,addToken} = appSlice.actions
 export default appSlice.reducer

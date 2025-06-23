@@ -4,12 +4,12 @@ import {useNavigate} from 'react-router-dom'
 function BlogCard({blog}) {
 
   const {title, category, subTitle, image, _id } = blog;
-  console.log({"blog":blog
-  })
+  // console.log({"blog":blog
+  // })
   const navigate = useNavigate()
 
   return ( 
-
+    
     <div onClick={()=>navigate(`/blog/${_id}`)}>
       <img src={image} alt="" className='aspect-video'/>
       <span className='ml-5 mt-3 px-3 py-1 inline-block bg-primary/20 

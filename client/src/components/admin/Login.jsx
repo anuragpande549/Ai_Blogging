@@ -34,7 +34,8 @@ function Login() {
     console.log(data);
       dispatch(addToken(data.accessToken));
     //  setToken(data.accessToken)
-     localStorage.setItem("accessToken", data.accessToken);
+document.cookie = `accessToken=${data.accessToken}; max-age=${60 * 60 * 24}; path=/; secure; SameSite=Strict`;
+
       clearFormData();
       navigator("/admin")
     } catch (error) {

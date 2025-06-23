@@ -2,17 +2,19 @@ import React, { useEffect, useState } from 'react';
 import BlogTableItems from './admin/BlogTableItems';
 import { getUserBlog } from '../context/fetchData';
 import { useSelector } from 'react-redux';
+import SkeletonRow from './admin/SkeletonRow';
 
 function ListBlog() {
-  const [blogs, setBlogs] = useState([]);
+  const [blogs, setBlogs] = useState(false);
   const token = useSelector((state) => state?.auth?.accessToken);
 
-  const page = { page: 1, limit: 10 };
+  const page = { page: 1, limit: 20 };
 
   const fetchBlogs = async () => {
     const data = await getUserBlog("/blogs/user-post", page, token);
     if (data) setBlogs(data);
   };
+
 
   useEffect(() => {
     fetchBlogs();
@@ -36,9 +38,9 @@ function ListBlog() {
             </tr>
           </thead>
           <tbody>
-            {blogs.map((blog, index) => (
+            {blogs?blogs.map((blog, index) => (
               <BlogTableItems key={blog._id} blog={blog}  index={index + 1} fetchBlog={fetchBlogs} />
-            ))}
+            )):<SkeletonRow/>}
           </tbody>
         </table>
       </div>
