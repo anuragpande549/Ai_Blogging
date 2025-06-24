@@ -20,7 +20,7 @@ const allCommentsByUserBlogs = asyncHandler(async (req, res) => {
       options: { sort: { createdAt: -1 } }, // optional: newest first
       populate:({
         path:"blog",
-        select:"title -_id"
+        select:"title _id"
       })
     });
 
@@ -90,13 +90,20 @@ const approveStatus = asyncHandler(async (req, res) => {
   );
 });
 
-const deleteComment = asyncHandler(async(req, res)=>{
-    const {commentID} = req.body;
-if (!commentID) throw new ApiError(400, "Comment ID is needed");
+const deleteComment = asyncHandler(async (req, res) => {
+  const { commentID, blogID } = req.body.commentID;
+  console.log({ commentID, blogID })
+  if (!commentID) throw new ApiError(400, "Comment ID is needed");
 
-    const deleteByID = await Comment.findOneAndDelete({_id:commentID}, {new:true});
+  const blogComment = await Blog.findByIdAndUpdate(
+    blogID,
+    { $pull: { comments: commentID } },
+    { new: true }
+  );
+  if (!blogComment) throw new ApiResponse(402, "blog comment delete failed");
+  const deleteByID = await Comment.findOneAndDelete({ _id: commentID }, { new: true });
 
-    if(!deleteByID) throw new ApiError(500,"delete is failed");
+  if (!deleteByID) throw new ApiError(500,"delete is failed");
     
     res.status(200).json(new ApiResponse(200, "Delete is success", deleteByID))
 })

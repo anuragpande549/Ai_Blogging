@@ -15,8 +15,9 @@ function CommentTableItems({ comment, index, fetchComments }) {
     fetchComments?.();
   };
 
+  console.log({comment});
   const handleDelete = async () => {
-    const data = await removeComment("/comment/delete", _id , token);
+    const data = await removeComment("/comment/delete", {commentID:_id, blogID:blog?._id} , token);
     if (data) toast.success("Comment deleted!");
     fetchComments?.();
   };
