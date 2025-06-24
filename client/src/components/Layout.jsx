@@ -12,19 +12,22 @@ function Layout() {
 const token = useSelector((state) => state?.auth?.accessToken);
   
   const dispatch = useDispatch();
-  const navigator = useNavigate();
+const navigator = useNavigate();
 
 
+const navigateHome = ()=>{
+  navigator("/")
+}
 
   const logout =async () => {
     try {
       const data =await logOut("/user/logOut", token);
-      if(data){
+      if(data.success){
 
         dispatch(addToken(false));
-        localStorage.removeItem("accessToken")
-        navigator('/')
+        document.cookie = "accessToken=; max-age=0; path=/; secure; SameSite=Strict";
         toast.success("LogOut Success")
+        navigateHome()
       }
       console.log("logOut :",data);
     } catch (error) {
@@ -38,7 +41,7 @@ const token = useSelector((state) => state?.auth?.accessToken);
     <div className='flex items-center justify-between py-2 h-[70px] px-4
     sm:px-12 border-b border-gray-200'>
         <img src={assets.logo} alt=""  
-        onClick={()=>(navigator('/'))}
+        onClick={navigateHome}
         className='w-32 sm:w-40 cursor-pointer'
          />
          <button onClick={logout} className='text-sm px-8 py-2 bg-primary text-white rounded-full
