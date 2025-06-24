@@ -9,9 +9,9 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+
 const cloudinaryUpload = async function (localFilePath) {
-
-
+    
     try {
         if (!localFilePath) {
             throw new ApiError(400, "File name or path missing");

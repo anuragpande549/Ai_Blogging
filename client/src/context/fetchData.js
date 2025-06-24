@@ -172,13 +172,13 @@ const getUserBlog = async (url, formData, token) => {
       toast.success(response.data.message);
       return response.data.data;
     } else {
-      toast.error("Something went wrong");
+ 
     }
   } catch (error) {
     const message =
       error?.response?.data?.message || error.message || "Something went wrong";
     console.error(message);
-    toast.error(message);
+
     return false;
   }
 };
@@ -347,7 +347,7 @@ const updateBlog = async (url, formData, token) => {
   try {
     const { data } = await axios.put(url, formData, {
       headers: {
-        'Content-Type': "application/json",
+        'Content-Type': "multipart/form-data",
         Authorization: `Bearer ${token}`
       }
     });

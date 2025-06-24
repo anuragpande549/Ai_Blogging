@@ -4,6 +4,7 @@ import { logIn } from '../../context/fetchData';
 import { addToken } from '../redux/appSlice';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import Navbar from '../Navbar';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -52,6 +53,8 @@ document.cookie = `accessToken=${data.accessToken}; max-age=${60 * 60 * 24}; pat
   };
 
   return (
+    <>
+    <Navbar type={"admin"}/>
     <div className='flex items-center justify-center h-screen'>
       <div className='w-full max-w-sm p-6 border border-primary/30 shadow-xl shadow-primary/15 rounded-lg'>
         <div className='text-center mb-6'>
@@ -68,7 +71,7 @@ document.cookie = `accessToken=${data.accessToken}; max-age=${60 * 60 * 24}; pat
               required
               placeholder='Your email ID'
               className='border-b-2 border-gray-300 p-2 outline-none'
-            />
+              />
           </div>
           <div className='flex flex-col mb-6'>
             <label>Password</label>
@@ -79,18 +82,19 @@ document.cookie = `accessToken=${data.accessToken}; max-age=${60 * 60 * 24}; pat
               required
               placeholder='Your password'
               className='border-b-2 border-gray-300 p-2 outline-none'
-            />
+              />
           </div>
           <button
             type='submit'
             className='w-full py-3 font-medium bg-primary text-white rounded cursor-pointer hover:bg-primary/90 transition-all'
             disabled={isLogin}
-          >
+            >
             {isLogin ? 'Logging in...' : 'Login'}
           </button>
         </form>
       </div>
     </div>
+            </>
   );
 }
 

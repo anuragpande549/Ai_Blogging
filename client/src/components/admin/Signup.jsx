@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { signUp } from '../../context/fetchData';
-
+import Navbar from "../Navbar"
 function Signup() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -54,7 +54,8 @@ function Signup() {
     submitProfile();
   };
 
-  return (
+  return (<>
+      <Navbar type={"Login"}/>
     <div className="flex items-center justify-center h-screen">
       <div className="w-full max-w-md p-6 border border-primary/30 shadow-xl shadow-primary/15 rounded-lg">
         <div className="text-center">
@@ -100,6 +101,7 @@ function Signup() {
         </form>
       </div>
     </div>
+  </>
   );
 }
 

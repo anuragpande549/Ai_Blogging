@@ -17,11 +17,9 @@ const ToggleDelete = async () => {
   const confirmDelete = window.confirm(`Do you want to delete "${title}"?`);
   if (!confirmDelete) return;
 
-  const result = await postDelete("/blogs/delete-blog",{ blogId:_id }, token);
-  
-  if (result) {
+  await postDelete("/blogs/delete-blog",{ blogId:_id }, token);
     fetchBlog?.(); // Refresh blog list
-  }
+
 };
 
 

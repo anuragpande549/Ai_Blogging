@@ -9,16 +9,16 @@ function ListBlog() {
   const token = useSelector((state) => state?.auth?.accessToken);
 
   const page = { page: 1, limit: 20 };
-
+  console.log({blogs})
   const fetchBlogs = async () => {
     const data = await getUserBlog("/blogs/user-post", page, token);
-    if (data) setBlogs(data);
+    setBlogs(data);
   };
 
 
   useEffect(() => {
     fetchBlogs();
-  }, [token]);
+  }, [token],blogs);
 
   return (
     <div className="flex-1 pt-5 px-5 sm:pt-12 sm:pl-16 bg-blue-50/50">
