@@ -48,13 +48,13 @@ const getUserBlog = asyncHandler(async (req, res) => {
 
 const createBlog = asyncHandler(async (req, res)=>{
     const user = req?.user
-    const { title, subTitle, description ,category , isPublish } = req.body
+    const { title, subTitle, description ,category , image , isPublish } = req.body
     if([ title, subTitle, description , isPublish ].some((field) => (field.trim() === ""))) throw new ApiError(402 , "All field are required");
 
-    const image = req?.files?.image?.[0]?.path;
-    if (!image) throw new ApiError(401, "image path is not receive");
+    const newImage = image ? image : req?.files?.image?.[0]?.path;
+    if (!newImage) throw new ApiError(401, "image path is not receive");
 
-    const uploadImage = await cloudinaryUpload(image);
+    const uploadImage = await cloudinaryUpload(newImage);
     if (!uploadImage) throw new ApiError(402, "cloudinary details are not receive");
 
     const updateCategory = await Category.findOneAndUpdate(
@@ -99,7 +99,7 @@ const updateBlog = asyncHandler(async (req, res) => {
   const user = req?.user;
   const {blogId} = req.body;
 
-  const { title, subTitle, description, category, isPublish } = req.body;
+  const { title, subTitle, description, category,image, isPublish } = req.body;
   
   if (!blogId) throw new ApiError(400, "Blog ID is required for update");
   
@@ -124,11 +124,11 @@ const updateBlog = asyncHandler(async (req, res) => {
     updatedFields.category = updatedCategory._id;
   }
 
-  const image =   req?.files?.image?.[0]?.path;
-  console.log({image});
+  const newImage =   image? image :req?.files?.image?.[0]?.path;
+  console.log({newImage});
 
-  if (image) {
-    const uploadedImage = await cloudinaryUpload(image);
+  if (newImage) {
+    const uploadedImage = await cloudinaryUpload(newImage);
     if (!uploadedImage) throw new ApiError(400, "Failed to upload image");
     updatedFields.image = uploadedImage.secure_url;
   }

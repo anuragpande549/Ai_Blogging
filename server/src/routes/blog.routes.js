@@ -7,19 +7,21 @@ const blogRoutes = express.Router();
 
 blogRoutes.route("/").get(allBlogData)
 
-blogRoutes.route("/create-blog").post( authUser, upload.fields([
-    {
-        name:"image",
-        maxCount:1
-    }
-]), createBlog );
+// blogRoutes.route("/create-blog").post( authUser, upload.fields([
+//     {
+//         name:"image",
+//         maxCount:1
+//     }
+// ]), createBlog );
+blogRoutes.route("/create-blog").post( authUser, createBlog );
 
-blogRoutes.route("/update-blog").put(authUser, upload.fields([
-    {
-        name:"image",
-        maxCount:1
-    }
-]), updateBlog );
+blogRoutes.route("/update-blog").put(authUser,  updateBlog );
+// blogRoutes.route("/update-blog").put(authUser, upload.fields([
+//     {
+//         name:"image",
+//         maxCount:1
+//     }
+// ]), updateBlog );
 
 blogRoutes.route("/delete-blog").delete(authUser, deleteBlog);
 

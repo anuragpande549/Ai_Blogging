@@ -15,13 +15,13 @@ const BlogList = () => {
   const category = useSelector((state) => state.homePage.category[0]);
   const search = useSelector((state)=>state.search)
 
+  async function fetchBlogData() {
+    const data = await getData('blogs');
+    dispatch(addBlogs(data.blogs));
+    dispatch(addCategory(data.category));
+  }
+  fetchBlogData();
   useEffect(() => {
-    async function fetchBlogData() {
-      const data = await getData('blogs');
-      dispatch(addBlogs(data.blogs));
-      dispatch(addCategory(data.category));
-    }
-    fetchBlogData();
   }, [dispatch]);
 
   if (!blogs) return <BlogSkeleton />;

@@ -5,9 +5,10 @@ import { addToken } from '../redux/appSlice';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../Navbar';
+import DemoLogin from './DemoLogin';
 
 function Login() {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState('');
   const [isLogin, setIsLogin] = useState(false);
   const dispatch = useDispatch()
@@ -17,6 +18,8 @@ function Login() {
     setEmail('');
     setPassword('');
   };
+
+  
 
   const submitForm = async () => {
     if (!email || !password) {
@@ -92,6 +95,7 @@ document.cookie = `accessToken=${data.accessToken}; max-age=${60 * 60 * 24}; pat
             {isLogin ? 'Logging in...' : 'Login'}
           </button>
         </form>
+        <DemoLogin/>
       </div>
     </div>
             </>

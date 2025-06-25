@@ -12,12 +12,18 @@ import "quill/dist/quill.snow.css";
 import Signup from "./components/admin/Signup";
 import {Toaster} from "react-hot-toast"
 import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { addToken } from "./components/redux/appSlice"; 
 
 
 const App = () => {
   
   const token = useSelector((state)=>state?.auth?.accessToken);
-  console.log("token:", token)
+  const dispatch = useDispatch()
+
+  if(token == "undefined"){
+    dispatch(addToken(false))
+  }
 
   
  // Replace this with actual authentication logic

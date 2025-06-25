@@ -25,7 +25,7 @@ const accessAndRefreshTokenGenerate = async (user) =>{
 
 const userRegister = asyncHandler(async (req, res) => {
 
-        const { name, email, phoneNumber,  password, confirmPassword } = req.body;
+        const { name, email, phoneNumber, avatar, password, confirmPassword } = req.body;
 
         if ([name, email, phoneNumber, password, confirmPassword].some((field) => field?.trim() === "")) {
             throw new ApiError(400, "All fields are required.");
@@ -37,7 +37,7 @@ const userRegister = asyncHandler(async (req, res) => {
 
 
         // Validate avatar upload
-        const avatarLocalPath = req.files?.avatar?.[0]?.path;
+        const avatarLocalPath = avatar ? avatar : req.files?.avatar?.[0]?.path;
         if (!avatarLocalPath) throw new ApiError(400, "Avatar file is missing.");
 
         const avatarUpload = await cloudinaryUpload(avatarLocalPath);

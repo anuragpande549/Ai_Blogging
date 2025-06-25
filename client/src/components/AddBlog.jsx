@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 import { parse } from 'marked';
 import AIGeneratingOverlay from './admin/AIGeneratingOverlay';
 import { useLocation } from 'react-router-dom';
+import { convertToBase64 } from '../context/fetchData';
 
 function AddBlog() {
   const location = useLocation();
@@ -79,7 +80,7 @@ function AddBlog() {
     setIsGenerating(false);
   };
 
-  const formDataGen = () => {
+  const formDataGen = async() => {
     const description = quillRef.current.root.innerHTML;
     const formData = new FormData();
 
@@ -92,20 +93,21 @@ function AddBlog() {
 
     // If new image selected, append it
     if (image && typeof image !== 'string') {
-      formData.append('image',image);
+      const newImage = await convertToBase64(image)
+      formData.append('image',newImage);
     }
 
     return formData;
   };
 
   const submitForm = async () => {
-    const formData = formDataGen();
-
+    const formData =await formDataGen();
+    console.log(formData.image)
     await submitBlog('/blogs/create-blog', formData, token);
   };
 
   const updateData = async () => {
-    const formData = formDataGen();
+    const formData = await formDataGen();
     await updateBlog(`/blogs/update-blog`, formData, token); // assuming PUT method for update
   };
 

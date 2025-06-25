@@ -4,6 +4,9 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { signUp } from '../../context/fetchData';
 import Navbar from "../Navbar"
+import { convertToBase64 } from '../../context/fetchData';
+import DemoLogin from './DemoLogin';
+
 function Signup() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -36,7 +39,8 @@ function Signup() {
     formData.append('phoneNumber', phone);
     formData.append('password', password);
     formData.append('confirmPassword', confirmPassword);
-    formData.append('avatar', profileImage); // Ensure backend expects 'avatar'
+    const image = await convertToBase64(profileImage)
+    formData.append('avatar', image); // Ensure backend expects 'avatar'
 
     const data = await signUp("/user/register", formData);
     if(data){
@@ -102,6 +106,7 @@ function Signup() {
             {isSubmitting ? 'Signing Up...' : 'Sign Up'}
           </button>
         </form>
+        <DemoLogin/>
       </div>
     </div>
   </>

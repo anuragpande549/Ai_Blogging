@@ -4,8 +4,14 @@ import toast from "react-hot-toast";
 axios.defaults.baseURL = import.meta.env.VITE_BASE_URL;
 // axios.defaults.withCredentials = true
 
-
-
+const convertToBase64 = (file) =>{
+  return new Promise((res,rej)=>{
+    const render = new FileReader();
+    render.readAsDataURL(file);
+    render.onload = () => res(render.result)
+    render.onerror = (error) => res(error)
+  })
+}
 
 const getData = async (url) => {
   try {
@@ -25,7 +31,8 @@ const getData = async (url) => {
 const signUp = async (url, formData) => {
   try {
     const { data } = await axios.post(url, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+      // headers: { 'Content-Type': 'multipart/form-data' },
+      headers: { "Content-Type": "application/json" },
     });
     console.log(data);
     if (data.success) {
@@ -92,7 +99,8 @@ const submitBlog = async (url, formData, token) => {
   try {
     const { data } = await axios.post(url, formData, {
       headers: {
-        'Content-Type': 'multipart/form-data',
+        // 'Content-Type': 'multipart/form-data',
+  "Content-Type": "application/json" ,
         Authorization: `Bearer ${token}`
       }
     });
@@ -348,7 +356,8 @@ const updateBlog = async (url, formData, token) => {
   try {
     const { data } = await axios.put(url, formData, {
       headers: {
-        'Content-Type': "multipart/form-data",
+        // 'Content-Type': "multipart/form-data",
+            "Content-Type": "application/json" ,
         Authorization: `Bearer ${token}`
       }
     });
@@ -373,5 +382,5 @@ const updateBlog = async (url, formData, token) => {
 
 
 export {getData, signUp,logIn, logOut, submitBlog, generateBlog, getBlogData,updateBlog,
-  getUserBlog,changePublish,postDelete,getComment,putStatus,deleteComment,addComment
+  getUserBlog,changePublish,postDelete,getComment,putStatus,deleteComment,addComment,convertToBase64
 };
