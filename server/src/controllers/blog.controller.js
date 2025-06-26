@@ -237,7 +237,7 @@ const generateContent = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Title and subTitle are required");
   }
 
-  const prompt = `Write a comprehensive and SEO-optimized blog post on the topic "${title}". 
+  const prompt = `Write a comprehensive and SEO-optimized blog post in (important not blog content not more then 150 words) on the topic "${title}". 
 Include a compelling introduction, detailed explanation under the subtitle "${subTitle}", 
 and incorporate this description context: ${description}`
 // Make sure the tone is informative and engaging, suitable for readers with general interest in the topic
