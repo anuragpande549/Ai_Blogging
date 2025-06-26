@@ -32,7 +32,7 @@ function ListBlog() {
               <th className="px-2 py-4">Blog</th>
               <th className="px-2 py-4 max-sm:hidden">Date</th>
               <th className="px-2 py-4 max-sm:hidden">Status</th>
-              <th className="px-2 py-4">Action</th>
+              <th className="px-2 py-4 ">Action</th>
               <th className="px-2 py-4">Edit</th>
               <th className="px-2 py-4">Delete</th>
             </tr>

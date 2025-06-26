@@ -44,7 +44,7 @@ const ToggleDelete = async () => {
       <td className="px-2 py-4">{title}</td>
       <td className="px-2 py-4 max-sm:hidden">{BlogDate.toDateString()}</td>
       <td
-        className={`px-2 py-4 ${
+        className={`px-2 py-4 max-sm:hidden ${
           isPublish ? "text-green-600" : "text-red-600"
         }`}
       >
