@@ -8,7 +8,6 @@ import Loding from '../Loding';
 import { getBlogData, addComment as postComment } from '../../context/fetchData';
 import { useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
-import { motion } from 'framer-motion';
 
 const Blog = () => {
   const { id } = useParams();
@@ -16,6 +15,7 @@ const Blog = () => {
   const [comments, setComments] = useState([]);
   const [name, setName] = useState('');
   const [content, setContent] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
   const token = useSelector((state) => state?.auth?.accessToken);
 
   const formData = {
@@ -31,135 +31,158 @@ const Blog = () => {
     if (result) {
       toast.success('Comment added! Waiting for approval.');
       setContent('');
+      fetchBlogData();
     } else {
       toast.error('Failed to add comment.');
     }
   };
 
   const fetchBlogData = async () => {
-    const response = await getBlogData('/blogs/get-blog', id);
-    setData(response.data);
-    setComments(response?.data?.blogDetails?.comments || []);
+    setIsLoading(true);
+    try {
+      const response = await getBlogData('/blogs/get-blog', id);
+      setData(response.data);
+      setComments(response?.data?.blogDetails?.comments || []);
+    } catch (error) {
+      toast.error('Failed to load blog');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
     fetchBlogData();
   }, [id]);
 
-  if (!data) return <Loding />;
+  if (isLoading) return <Loding />;
 
   return (
-    <div className='relative'>
-      <img src={assets.gradientBackground} alt='' className='absolute -top-50 -z-10 opacity-50' />
+    <div className='relative overflow-x-hidden'>
+      <img 
+        src={assets.gradientBackground} 
+        alt='' 
+        className='absolute top-0 left-0 w-full h-full -z-10 opacity-50 object-cover'
+      />
       <Navbar />
 
-      <motion.div
-        className='text-center mt-20 text-gray-600'
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-      >
+      {/* Hero Section */}
+      <section className='text-center mt-16 md:mt-28 px-4 text-gray-600'>
         <p className='text-primary py-4 font-medium'>
           Published On {Moment(data.blogDetails.createdAt).format('MMMM Do YYYY')}
         </p>
-        <h1 className='text-2xl sm:text-5xl font-semibold max-w-2xl mx-auto text-gray-800'>
+        <h1 className='text-3xl sm:text-4xl md:text-5xl font-semibold mx-auto text-gray-800 max-w-4xl'>
           {data.blogDetails.title}
         </h1>
-        <h2 className='my-5 max-w-lg truncate mx-auto'>{data.blogDetails.subTitle}</h2>
+        <h2 className='my-5 mx-auto text-gray-600 max-w-2xl text-lg md:text-xl'>
+          {data.blogDetails.subTitle}
+        </h2>
         <p className='inline-block py-1 px-4 rounded-full mb-6 border text-sm border-primary/35 font-medium text-primary'>
           {data.userDetails.name}
         </p>
-      </motion.div>
+      </section>
 
-      <div className='mx-5 max-w-5xl md:mx-auto my-10'>
-        <motion.img
-          src={data.blogDetails.image}
-          alt=''
-          className='rounded-3xl mb-5'
-          initial={{ scale: 0.95, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.2 }}
-        />
+      {/* Blog Content */}
+      <div className='mx-4 sm:mx-6 md:mx-8 lg:mx-auto max-w-4xl xl:max-w-5xl my-10'>
+        <div className='overflow-hidden rounded-2xl md:rounded-3xl shadow-lg mb-8'>
+          <img
+            src={data.blogDetails.image}
+            alt={data.blogDetails.title}
+            className='w-full h-auto object-cover'
+          />
+        </div>
+        
         <div
+          className='rich-text text-gray-700 leading-relaxed text-lg'
           dangerouslySetInnerHTML={{ __html: data.blogDetails.description }}
-          className='rich-text text-gray-700 leading-relaxed'
         ></div>
       </div>
 
-      {/* Comments */}
-      <motion.div
-        className='mt-14 mb-10 max-w-3xl mx-auto'
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.4 }}
-      >
-        <p className='font-semibold text-xl mb-4'>Comments ({comments.length})</p>
-        <div className='flex flex-col gap-4'>
+      {/* Comments Section */}
+      <section className='mt-14 mb-10 mx-4 sm:mx-6 md:mx-8 lg:mx-auto max-w-3xl'>
+        <h3 className='font-semibold text-2xl mb-6'>
+          Comments ({comments.length})
+        </h3>
+        
+        <div className='flex flex-col gap-5'>
           {comments.map((item) => (
-            <motion.div
+            <div
               key={item._id}
-              className='relative bg-primary/5 border border-primary/10 max-w-xl p-4 rounded text-gray-600'
-              initial={{ y: 10, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.3 }}
+              className='bg-white p-5 rounded-xl shadow-md border border-gray-100'
             >
-              <div className='flex items-center gap-2 mb-2'>
-                <img src={assets.user_icon} alt='' className='w-6' />
-                <p className='font-medium'>{item?.user || 'Anonymous'}</p>
+              <div className='flex items-center gap-3 mb-3'>
+                <div className='bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16' />
+                <div>
+                  <p className='font-semibold'>{item?.user || 'Anonymous'}</p>
+                  <p className='text-sm text-gray-500'>
+                    {Moment(item.createdAt).fromNow()}
+                  </p>
+                </div>
               </div>
-              <p>{item.content}</p>
-              <p className='absolute right-4 bottom-3 text-xs text-gray-400'>
-                {Moment(item.createdAt).fromNow()}
-              </p>
-            </motion.div>
+              <p className='text-gray-700'>{item.content}</p>
+            </div>
           ))}
         </div>
 
-        {/* Add Comment */}
-        <div className='mt-10'>
-          <p className='font-semibold mb-4'>Add your comment</p>
-          <form onSubmit={handleAddComment} className='flex flex-col gap-4 max-w-lg'>
+        {/* Add Comment Form */}
+        <div className='mt-14 p-6 bg-white rounded-xl shadow-md'>
+          <h3 className='font-semibold text-xl mb-5'>
+            Add your comment
+          </h3>
+          <form onSubmit={handleAddComment} className='flex flex-col gap-5'>
             <input
               type='text'
               placeholder='Your Name'
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
-              className='w-full p-3 border border-gray-300 rounded outline-none focus:ring-2 focus:ring-primary'
+              className='w-full p-3 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-primary'
             />
             <textarea
               placeholder='Write a comment...'
               value={content}
               onChange={(e) => setContent(e.target.value)}
               required
-              className='w-full p-3 border border-gray-300 rounded outline-none h-40 resize-none focus:ring-2 focus:ring-primary'
+              className='w-full p-3 border border-gray-300 rounded-lg outline-none h-32 resize-none focus:ring-2 focus:ring-primary'
             />
             <button
               type='submit'
-              className='bg-primary text-white rounded p-2 px-6 font-medium hover:bg-primary/90 transition-all'
+              className='bg-primary text-white rounded-lg py-3 px-8 font-medium text-lg self-start hover:bg-primary/90 transition-colors'
             >
-              Submit
+              Submit Comment
             </button>
           </form>
         </div>
 
-        {/* Share Buttons */}
-        <div className='my-24'>
-          <p className='font-semibold mb-4'>Share this post</p>
-          <div className='flex gap-4'>
-            {[assets.facebook_icon, assets.twitter_icon, assets.googleplus_icon].map((icon, i) => (
-              <motion.img
+        {/* Share Section */}
+        <div className='my-16 text-center'>
+          <h3 className='font-semibold text-2xl mb-6'>
+            Share this post
+          </h3>
+          <div className='flex justify-center gap-6 flex-wrap'>
+            {[
+              { icon: assets.facebook_icon, name: 'Facebook' },
+              { icon: assets.twitter_icon, name: 'Twitter' },
+              { icon: assets.googleplus_icon, name: 'LinkedIn' },
+            ].map((social, i) => (
+              <div
                 key={i}
-                src={icon}
-                alt='social'
-                width={50}
-                whileHover={{ scale: 1.1 }}
-                className='cursor-pointer'
-              />
+                className='flex flex-col items-center cursor-pointer'
+              >
+                <div className='bg-gray-100 p-4 rounded-full hover:bg-primary/10 transition-colors'>
+                  <img 
+                    src={social.icon} 
+                    alt={social.name}
+                    className='w-8 h-8 object-contain'
+                  />
+                </div>
+                <span className='mt-2 text-gray-600 hover:text-primary transition-colors'>
+                  {social.name}
+                </span>
+              </div>
             ))}
           </div>
         </div>
-      </motion.div>
+      </section>
 
       <Footer />
     </div>
